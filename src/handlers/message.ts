@@ -64,9 +64,13 @@ async function handleIncomingMessage(message: Message) {
 		}
 		
 		// Ignore non-audio media
-		if (message.type !== MessageTypes.VOICE) return;
+		const type = message.hasQuotedMsg ? (await message.getQuotedMessage()).type : message.type
+
+		if (type !== MessageTypes.VOICE) return;
 
 		const media = message.hasMedia ? await message.downloadMedia() : await (await message.getQuotedMessage()).downloadMedia();
+
+		if(!media) return;
 
 		// Check if transcription is enabled (Default: false)
 		if (!getConfig("transcription", "enabled")) {
