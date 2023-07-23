@@ -23,10 +23,22 @@ import { transcribeOpenAI } from "../providers/openai";
 // For deciding to ignore old messages
 import { botReadyTimestamp } from "../index";
 
+const users: {[id: string]: any} = {}
+
 // Handles message
 async function handleIncomingMessage(message: Message) {
 	let messageString = message.body;
 	const isPrivate = message.from.includes('@c.us')
+	// const dbChatFile = `db/${message.from}.json`
+	// if(isPrivate){
+	// 	if(!fs.existsSync(dbChatFile)){
+	// 		fs.writeFileSync(dbChatFile, JSON.stringify([await message.getChat()], null, 2))
+	// 	}
+	// }
+
+	if(!users[message.from]){
+		users[message.from] = message.from
+	}
 
 	// Prevent handling old messages
 	if (message.timestamp != null) {
@@ -57,7 +69,7 @@ async function handleIncomingMessage(message: Message) {
 	}
 
 	// Transcribe audio
-	if (message.hasMedia || (message.hasQuotedMsg && startsWithIgnoreCase(messageString, 'vn'))) {
+	if (message.hasMedia || (message.hasQuotedMsg && startsWithIgnoreCase(messageString, config.vnPrefix))) {
 		// ignore vn from group;
 		if(!isPrivate && message.hasMedia){
 			return;
@@ -131,6 +143,12 @@ async function handleIncomingMessage(message: Message) {
 	// Clear conversation context (!clear)
 	if (startsWithIgnoreCase(messageString, config.resetPrefix)) {
 		await handleDeleteConversation(message);
+		return;
+	}
+
+	// Jumlah user
+	if (startsWithIgnoreCase(messageString, config.userPrefix)) {
+		message.reply('jumlah user ' + Object.keys(users).length)
 		return;
 	}
 

@@ -27,6 +27,8 @@ interface IConfig {
 	stableDiffusionPrefix: string;
 	langChainPrefix: string;
 	resetPrefix: string;
+	userPrefix: string;
+	vnPrefix: string;
 	aiConfigPrefix: string;
 
 	// Groupchats
@@ -71,6 +73,8 @@ export const config: IConfig = {
 	dallePrefix: process.env.DALLE_PREFIX || "!dalle", // Default: !dalle
 	stableDiffusionPrefix: process.env.STABLE_DIFFUSION_PREFIX || "!sd", // Default: !sd
 	resetPrefix: process.env.RESET_PREFIX || "!reset", // Default: !reset
+	userPrefix: process.env.USER_PREFIX || "!user", // Default: !user
+	vnPrefix: process.env.VN_PREFIX || "vn", // Default: !user
 	aiConfigPrefix: process.env.AI_CONFIG_PREFIX || "!config", // Default: !config
 	langChainPrefix: process.env.LANGCHAIN_PREFIX || "!lang", // Default: !lang
 
