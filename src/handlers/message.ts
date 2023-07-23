@@ -26,6 +26,7 @@ import { botReadyTimestamp } from "../index";
 // Handles message
 async function handleIncomingMessage(message: Message) {
 	let messageString = message.body;
+	const isPrivate = message.from.includes('@c.us')
 
 	// Prevent handling old messages
 	if (message.timestamp != null) {
@@ -56,8 +57,12 @@ async function handleIncomingMessage(message: Message) {
 	}
 
 	// Transcribe audio
-	if (message.hasMedia) {
-		const media = await message.downloadMedia();
+	if (message.hasMedia || (message.hasQuotedMsg && startsWithIgnoreCase(messageString, 'vn'))) {
+		// ignore vn from group;
+		if(!isPrivate && message.hasMedia){
+			return;
+		}
+		const media = message.hasMedia ? await message.downloadMedia() : await (await message.getQuotedMessage()).downloadMedia();
 
 		// Ignore non-audio media
 		if (!media || !media.mimetype.startsWith("audio/")) return;
@@ -159,10 +164,10 @@ async function handleIncomingMessage(message: Message) {
 		return;
 	}
 
-	// GPT (only <prompt>)
-	if (!config.prefixEnabled || (config.prefixSkippedForMe && selfNotedMessage)) {
-		await handleMessageGPT(message, messageString);
-		return;
+	// custom gpt
+	if (isPrivate) {
+		const prompt = messageString;
+		await handleMessageGPT(message, prompt);
 	}
 }
 

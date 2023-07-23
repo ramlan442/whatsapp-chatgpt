@@ -22,7 +22,7 @@ const start = async () => {
 	// WhatsApp Client
 	const client = new Client({
 		puppeteer: {
-			args: ["--no-sandbox"]
+			args: ["--no-sandbox", "--disable-extensions"]
 		},
 		authStrategy: new LocalAuth({
 			clientId: undefined,
@@ -67,12 +67,12 @@ const start = async () => {
 	});
 
 	// WhatsApp message
-	client.on(Events.MESSAGE_RECEIVED, async (message: any) => {
+	client.on(Events.MESSAGE_RECEIVED, async (message: Message) => {
 		// Ignore if message is from status broadcast
 		if (message.from == constants.statusBroadcast) return;
 
 		// Ignore if it's a quoted message, (e.g. Bot reply)
-		if (message.hasQuotedMsg) return;
+		if (message.fromMe) return;
 
 		await handleIncomingMessage(message);
 	});
