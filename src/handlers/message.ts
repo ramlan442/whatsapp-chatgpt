@@ -1,4 +1,4 @@
-import { Message } from "whatsapp-web.js";
+import { Message, MessageTypes } from "whatsapp-web.js";
 import { startsWithIgnoreCase } from "../utils";
 
 // Config & Constants
@@ -62,10 +62,11 @@ async function handleIncomingMessage(message: Message) {
 		if(!isPrivate && message.hasMedia){
 			return;
 		}
-		const media = message.hasMedia ? await message.downloadMedia() : await (await message.getQuotedMessage()).downloadMedia();
-
+		
 		// Ignore non-audio media
-		if (!media || !media.mimetype.startsWith("audio/")) return;
+		if (message.type !== MessageTypes.VOICE) return;
+
+		const media = message.hasMedia ? await message.downloadMedia() : await (await message.getQuotedMessage()).downloadMedia();
 
 		// Check if transcription is enabled (Default: false)
 		if (!getConfig("transcription", "enabled")) {
